@@ -27,12 +27,63 @@ class Automate:
         self.transitions.append(transition)
     
     def est_deterministe(self) -> bool:
+        # ovir si il ya plus de une etat initiaux
+        initial_states = [state for state in self.etats if "initial" in state.type]
+        if len(initial_states) != 1:
+            return False
+        
         transitions = defaultdict(dict)
         for t in self.transitions:
             if t.alphabet.valeur in transitions[t.source.id]:
                 return False
             transitions[t.source.id][t.alphabet.valeur] = t.destination.id
         return True
+    
+    def est_complet(self) -> bool:
+    # Create a mapping of source state to its outgoing transitions by symbol
+        transitions = defaultdict(set)
+        for t in self.transitions:
+            transitions[t.source.id].add(t.alphabet.valeur)
+
+        # Get all symbols in the alphabet
+        alphabet_symbols = {a.valeur for a in self.alphabets}
+
+        # Check for each state and each symbol
+        for etat in self.etats:
+            state_id = etat.id
+            for symbol in alphabet_symbols:
+                if symbol not in transitions[state_id]:
+                    return False
+        return True
+    
+    def completer_automate(self):
+       
+        # Check if a sink state ("Puits") already exists
+        sink = next((e for e in self.etats if e.label == "Puits"), None)
+        if not sink:
+            sink_id = max((e.id for e in self.etats), default=0) + 1
+            sink = Etat(sink_id, "Puits", "normal")
+            self.ajouter_etat(sink)
+
+        symbols = {a.valeur for a in self.alphabets}
+
+        # Add missing transitions to sink
+        for etat in self.etats:
+            if etat == sink:
+                continue
+            existing_symbols = {t.alphabet.valeur for t in self.transitions if t.source.id == etat.id}
+            for symbol in symbols - existing_symbols:
+                alphabet_obj = next(a for a in self.alphabets if a.valeur == symbol)
+                transition_id = max((t.id for t in self.transitions), default=0) + 1
+                self.ajouter_transition(Transition(transition_id, etat, sink, alphabet_obj))
+
+        # Add self-loops for sink state
+        for symbol in symbols:
+            if not any(t.source.id == sink.id and t.alphabet.valeur == symbol for t in self.transitions):
+                alphabet_obj = next(a for a in self.alphabets if a.valeur == symbol)
+                transition_id = max((t.id for t in self.transitions), default=0) + 1
+                self.ajouter_transition(Transition(transition_id, sink, sink, alphabet_obj))
+
     
     def reconnait_mot(self, mot: str) -> bool:
         etats_actuels = {e.id for e in self.etats if "initial" in e.type}

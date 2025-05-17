@@ -1,0 +1,36 @@
+{
+    "nom": "dfa",
+    "alphabets": [
+        {
+            "idAlphabet": 1,
+            "valAlphabet": "a"
+        },
+        {
+            "idAlphabet": 2,
+            "valAlphabet": "b"
+        }
+    ],
+    "etats": [
+        {
+            "idEtat": 1,
+            "labelEtat": "0",
+            "typeEtat": "initial"
+        },
+        {
+            "idEtat": 2,
+            "labelEtat": "1",
+            "typeEtat": "initial"
+        },
+        {
+            "idEtat": 3,
+            "labelEtat": "2",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 4,
+            "labelEtat": "3",
+            "typeEtat": "final"
+        }
+    ],
+    "transitions": []
+}
