@@ -1,0 +1,67 @@
+{
+    "nom": "test2",
+    "alphabets": [
+        {
+            "idAlphabet": 1,
+            "valAlphabet": "a"
+        },
+        {
+            "idAlphabet": 2,
+            "valAlphabet": "b"
+        }
+    ],
+    "etats": [
+        {
+            "idEtat": 1,
+            "labelEtat": "S0",
+            "typeEtat": "initial"
+        },
+        {
+            "idEtat": 2,
+            "labelEtat": "S1",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 3,
+            "labelEtat": "S2",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 4,
+            "labelEtat": "S3",
+            "typeEtat": "final"
+        }
+    ],
+    "transitions": [
+        {
+            "idTransition": 1,
+            "etatSource": 1,
+            "etatDestination": 1,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 2,
+            "etatSource": 1,
+            "etatDestination": 1,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 3,
+            "etatSource": 1,
+            "etatDestination": 2,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 4,
+            "etatSource": 2,
+            "etatDestination": 3,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 5,
+            "etatSource": 3,
+            "etatDestination": 4,
+            "alphabet": 2
+        }
+    ]
+}

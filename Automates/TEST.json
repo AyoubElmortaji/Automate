@@ -1,0 +1,39 @@
+{
+    "nom": "TEST",
+    "alphabets": [
+        {
+            "idAlphabet": 1,
+            "valAlphabet": "a"
+        },
+        {
+            "idAlphabet": 2,
+            "valAlphabet": "b"
+        }
+    ],
+    "etats": [
+        {
+            "idEtat": 1,
+            "labelEtat": "q0",
+            "typeEtat": "initial"
+        },
+        {
+            "idEtat": 2,
+            "labelEtat": "q1",
+            "typeEtat": "final"
+        }
+    ],
+    "transitions": [
+        {
+            "idTransition": 1,
+            "etatSource": 1,
+            "etatDestination": 1,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 2,
+            "etatSource": 1,
+            "etatDestination": 2,
+            "alphabet": 2
+        }
+    ]
+}

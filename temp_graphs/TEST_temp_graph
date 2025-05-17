@@ -1,0 +1,10 @@
+// Automate TEST
+digraph {
+	rankdir=LR
+	1 [label=q0 color="#4a6fa5" fontcolor="#212529" shape=circle style=bold]
+	start_1 [label="" shape=none]
+	start_1 -> 1
+	2 [label=q1 color="#212529" fontcolor="#212529" shape=doublecircle style=""]
+	1 -> 1 [label=a color="#212529" fontcolor="#212529"]
+	1 -> 2 [label=b color="#212529" fontcolor="#212529"]
+}
