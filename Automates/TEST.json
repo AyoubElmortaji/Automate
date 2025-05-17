@@ -20,6 +20,11 @@
             "idEtat": 2,
             "labelEtat": "q1",
             "typeEtat": "final"
+        },
+        {
+            "idEtat": 3,
+            "labelEtat": "Puits",
+            "typeEtat": "normal"
         }
     ],
     "transitions": [
@@ -34,6 +39,30 @@
             "etatSource": 1,
             "etatDestination": 2,
             "alphabet": 2
+        },
+        {
+            "idTransition": 3,
+            "etatSource": 2,
+            "etatDestination": 3,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 4,
+            "etatSource": 2,
+            "etatDestination": 3,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 5,
+            "etatSource": 3,
+            "etatDestination": 3,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 6,
+            "etatSource": 3,
+            "etatDestination": 3,
+            "alphabet": 1
         }
     ]
 }

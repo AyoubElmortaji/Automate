@@ -625,13 +625,25 @@ class ModernAutomateApp:
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La vérification d'automate complet n'est pas encore implémentée.", parent=self.root)
+        if self.automate_courant.est_complet():
+            messagebox.showinfo("Résultat", "L'automate est complet.", parent=self.root)
+        else:
+            messagebox.showinfo("Résultat", "L'automate n'est pas complet.", parent=self.root)
 
     def completer_automate(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La complétion d'automate n'est pas encore implémentée.", parent=self.root)
+        if self.automate_courant.est_complet():
+            messagebox.showinfo("Info", "L'automate est déjà complet.", parent=self.root)
+            return
+        try:
+            self.automate_courant.completer_automate()
+            messagebox.showinfo("Succès", "L'automate a été complété avec succès.", parent=self.root)
+            self.afficher_details()
+            self.dessiner_automate()
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la complétion: {str(e)}", parent=self.root)
 
     def verifier_minimal(self):
         if not self.automate_courant:
