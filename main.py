@@ -606,6 +606,7 @@ class ModernAutomateApp:
             return
         messagebox.showinfo("Modifier Automate", "Fonctionnalité de modification à implémenter.", parent=self.root)
 
+
     def verifier_determinisme(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
@@ -615,11 +616,23 @@ class ModernAutomateApp:
         else:
             messagebox.showinfo("Résultat", "L'automate n'est pas déterministe.", parent=self.root)
 
+
     def transformer_afn_afd(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La transformation AFN -> AFD n'est pas encore implémentée.", parent=self.root)
+        if self.automate_courant.est_deterministe():
+            messagebox.showinfo("Résultat", "L'automate est déterministe.", parent=self.root)
+            return
+        try:
+            afd = self.automate_courant.determiniser()
+            self.automate_courant = afd
+            messagebox.showinfo("Succès", "Transformation AFN → AFD réussie.", parent=self.root)
+            self.afficher_details()
+            self.dessiner_automate()
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la transformation : {str(e)}", parent=self.root)
+
 
     def verifier_complet(self):
         if not self.automate_courant:
@@ -649,14 +662,35 @@ class ModernAutomateApp:
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La vérification d'automate minimal n'est pas encore implémentée.", parent=self.root)
+        try:
+            if self.automate_courant.est_minimal():
+                messagebox.showinfo("Résultat", "L'automate est minimal.", parent=self.root)
+            else:
+                messagebox.showinfo("Résultat", "L'automate n'est pas minimal.", parent=self.root)
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la vérification : {str(e)}", parent=self.root)
+
 
     def minimiser_automate(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La minimisation d'automate n'est pas encore implémentée.", parent=self.root)
-
+        if self.automate_courant.est_minimal():
+            messagebox.showinfo("resultat", "automat est dejat minimal", parent=self.root)
+            return
+        
+        messagebox.showinfo("resultat", "fonctionalite pas encore appliquer", parent=self.root)
+        return
+        """
+        try:
+            automate_min = self.automate_courant.minimiser_auto()
+            self.automate_courant = automate_min
+            messagebox.showinfo("Succès", "L'automate a été minimisé avec succès.", parent=self.root)
+            self.afficher_details()
+            self.dessiner_automate()
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la minimisation : {str(e)}", parent=self.root)
+        """
     def generer_mots_acceptes(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
