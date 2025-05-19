@@ -5,9 +5,9 @@ import os
 import random
 from pathlib import Path
 from typing import Optional
-import math # Import math for circular layout calculations
+import math 
 
-# Assuming your classes are in a 'classes' directory
+
 from classes.Alphabet import Alphabet
 from classes.Etat import Etat
 from classes.Transition import Transition
@@ -16,9 +16,9 @@ from classes.Automate import Automate
 class ModernAutomateApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("AutomateFlow Pro")
-        self.automate_courant: Optional[Automate] = None # Type hinting
-        # No need for self.current_image with manual drawing
+        self.root.title("Automata  - ENSAM CASA")
+        self.automate_courant: Optional[Automate] = None 
+       
 
         # Configuration de la fenêtre
         self.setup_styles()
@@ -40,13 +40,13 @@ class ModernAutomateApp:
         style.theme_use('clam')
 
         self.colors = {
-            "primary": "#4a6fa5", # Blueish
-            "secondary": "#f8f9fa", # Light gray
-            "accent": "#007bff",    # Brighter blue
-            "text": "#212529",      # Dark text
-            "border": "#ced4da",    # Light gray border
-            "canvas_bg": "#ffffff", # White
-            "final_state_bg": "#d4edda" # Light green
+            "primary": "#4a6fa5", 
+            "secondary": "#f8f9fa", 
+            "accent": "#007bff",    
+            "text": "#212529",      
+            "border": "#ced4da",    
+            "canvas_bg": "#ffffff", 
+            "final_state_bg": "#d4edda" 
         }
 
         style.configure('.', background=self.colors["secondary"], foreground=self.colors["text"], font=('Segoe UI', 10))
@@ -85,7 +85,7 @@ class ModernAutomateApp:
         main_pane = ttk.Panedwindow(self.root, orient=tk.HORIZONTAL)
         main_pane.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # --- Left Frame (Sidebar) ---
+        # --- Sidebar---
         left_frame = ttk.Frame(main_pane, width=300, style='TFrame')
         main_pane.add(left_frame, weight=1)
 
@@ -121,7 +121,7 @@ class ModernAutomateApp:
 
         ttk.Frame(left_frame, height=10, style='TFrame').pack() # Spacer
 
-        # --- Right Frame (Main Content Area) ---
+        # --- Main Content Area ---
         right_frame = ttk.Frame(main_pane, style='TFrame')
         main_pane.add(right_frame, weight=3)
 
@@ -161,7 +161,7 @@ class ModernAutomateApp:
         self.canvas.bind("<Configure>", self.on_canvas_resize)
 
 
-        # --- Toolbar at the bottom ---
+        # --- Toolbar  bottom ---
         tool_frame = ttk.Frame(self.root, style='TFrame')
         tool_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
 
@@ -206,13 +206,13 @@ class ModernAutomateApp:
         avancee_menu.add_command(label="Tester si un mot est reconnu", command=self.tester_mot)
         avancee_menu.add_command(label="Générer mots acceptés (longueur max)", command=self.generer_mots_acceptes)
         avancee_menu.add_command(label="Tester l'équivalence entre deux automates", command=self.tester_equivalence)
-        avancee_menu.add_command(label="Calculer Union de deux automates", command=self.calculer_union)
+        avancee_menu.add_command(label="Calculer Union de deux automates", command=self.calculerunion)
         avancee_menu.add_command(label="Calculer Intersection de deux automates", command=self.calculer_intersection)
         avancee_menu.add_command(label="Calculer Complément d'un automate", command=self.calculer_complement)
         avancee_menu.add_command(label="Afficher mots rejetés (longueur max)", command=self.afficher_mots_rejetes)
 
     def on_canvas_resize(self, event=None):
-         # Redraw automate when canvas is resized
+         # Redraw automate when canvas is rezized
          self.dessiner_automate()
 
 
@@ -227,12 +227,12 @@ class ModernAutomateApp:
         center_x, center_y = canvas_width // 2, canvas_height // 2
         num_etats = len(self.automate_courant.etats)
         state_radius = 30
-        # Calculate a dynamic layout radius based on the number of states and canvas size
-        layout_radius = min(center_x, center_y) * 0.7 # Use 70% of the smaller dimension
+        
+        layout_radius = min(center_x, center_y) * 0.7 # Use 70% of the small dimension
 
 
         if num_etats == 0:
-            return # Nothing to draw
+            return 
 
         # Position states in a circle
         etat_pos = {}
@@ -304,7 +304,7 @@ class ModernAutomateApp:
                 arrow_x = loop_center_x + loop_radius * math.cos(arrow_angle)
                 arrow_y = loop_center_y - loop_radius * math.sin(arrow_angle) # Tkinter y is inverted
 
-                # Simple arrow head drawing (can be improved)
+                # Simple arrow head drawing 
                 self.canvas.create_line(arrow_x, arrow_y, arrow_x - 5, arrow_y + 5, arrow=tk.LAST, width=2, fill=self.colors["text"])
 
 
@@ -694,38 +694,160 @@ class ModernAutomateApp:
     def generer_mots_acceptes(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
+        if self.automate_courant:
+            nb = simpledialog.askinteger(
+            "Longueur maximale",
+            "Entrez la longueur (1-10):",
+            parent=self.root,
+            minvalue=1,
+            maxvalue=10
+            )
+            if nb is None:  
+              return
+            mots = self.automate_courant.generer_mots_acceptes(max_length=nb)
+            messagebox.showinfo("Résultat", f"Les mots generer '{mots}' ", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "La génération de mots acceptés n'est pas encore implémentée.", parent=self.root)
 
     def tester_equivalence(self):
-        if not self.automate_courant:
-            messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
-            return
-        messagebox.showinfo("Fonctionnalité non implémentée", "Le test d'équivalence n'est pas encore implémentée.", parent=self.root)
+        top = tk.Toplevel(self.root)
+        top.title("Test d'équivalence")
+        top.geometry("400x300")
+        ttk.Label(top, text="Automate 1:").grid(row=0, column=0, padx=5, pady=5)
+        combo1 = ttk.Combobox(top, state="readonly")
+        combo1.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(top, text="Automate 2:").grid(row=1, column=0, padx=5, pady=5)
+        combo2 = ttk.Combobox(top, state="readonly")
+        combo2.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(top, text="Longueur max:").grid(row=2, column=0, padx=5, pady=5)
+        spin_length = ttk.Spinbox(top, from_=1, to=10, width=5)
+        spin_length.set(5)
+        spin_length.grid(row=2, column=1, padx=5, pady=5)
 
-    def calculer_union(self):
-        if not self.automate_courant:
-            messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
-            return
-        messagebox.showinfo("Fonctionnalité non implémentée", "Le calcul de l'union n'est pas encore implémenté.", parent=self.root)
+        fichiers = sorted(Path("automates").glob("*.json"))
+        noms = [f.stem for f in fichiers]
+        combo1['values'] = noms
+        combo2['values'] = noms
+        if len(noms) >= 2:
+            combo1.current(0)
+            combo2.current(1)
+
+        def lancer_test():
+                try:
+                    auto1 = Automate.charger(combo1.get())
+                    auto2 = Automate.charger(combo2.get())
+                    max_len = int(spin_length.get())
+                    resultat = Automate.sont_equivalents(auto1, auto2, max_len)
+                    if isinstance(resultat, tuple) and len(resultat) == 2:
+                        equivalent, message = resultat
+                    else:
+                        raise ValueError("La fonction doivent retourner un tuple (bool, str)")        
+                    if equivalent:
+                        messagebox.showinfo("Résultat", message, parent=top)
+                    else:
+                        messagebox.showwarning("Résultat", message, parent=top)    
+                except Exception as e:
+                     messagebox.showerror("Erreur", str(e), parent=top)
+        ttk.Button(top, text="Tester", command=lancer_test).grid(row=3, columnspan=2, pady=10)
+
+    def calculerunion(self):
+        fichiers = list(Path("automates").glob("*.json"))
+        noms = [f.stem for f in fichiers] 
+        if len(noms) < 2:
+            messagebox.showerror("Erreur", "Besoin d'au moins 2 automates", parent=self.root)
+            return  
+        top = tk.Toplevel(self.root)
+        top.title("Union d'automates")
+        top.geometry("400x200")
+        
+        ttk.Label(top, text="Automate 1:").grid(row=0, column=0, padx=5, pady=5)
+        combo1 = ttk.Combobox(top, values=noms, state="readonly")
+        combo1.current(0)
+        combo1.grid(row=0, column=1, padx=5, pady=5)
+        
+        ttk.Label(top, text="Automate 2:").grid(row=1, column=0, padx=5, pady=5)
+        combo2 = ttk.Combobox(top, values=noms, state="readonly")
+        combo2.current(1 if len(noms) > 1 else 0)
+        combo2.grid(row=1, column=1, padx=5, pady=5)
+        
+        ttk.Label(top, text="Longueur max:").grid(row=2, column=0, padx=5, pady=5)
+        spin_length = ttk.Spinbox(top, from_=1, to=20, width=5)
+        spin_length.set(5)
+        spin_length.grid(row=2, column=1, padx=5, pady=5, sticky='w')
+        
+        def lancer_calcul():
+            try:
+                auto1 = Automate.charger(combo1.get())
+                auto2 = Automate.charger(combo2.get())
+                max_len = int(spin_length.get())
+                
+                mots = auto1.union_mots(auto2, max_len)
+                resultat = "\n".join(sorted(mots, key=lambda x: (len(x), x))[:1000])
+                supplement = f"\n...{len(mots) - resultat.count('\n')} mots supplémentaires" if len(mots) > resultat.count('\n') else ""             
+                messagebox.showinfo("Résultat",f"{len(mots)} mots trouvés (longueur ≤ {max_len}):\n\n{resultat}{supplement}",parent=top)              
+            except Exception as e:
+                messagebox.showerror("Erreur", str(e), parent=top)
+        ttk.Button(top, text="Calculer l'union", command=lancer_calcul).grid(row=3, columnspan=2, pady=10)
 
     def calculer_intersection(self):
-        if not self.automate_courant:
-            messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
+        fichiers = list(Path("automates").glob("*.json"))
+        noms = [f.stem for f in fichiers]
+        
+        if len(noms) < 2:
+            messagebox.showerror("Erreur", "Besoin d'au moins 2 automates", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "Le calcul de l'intersection n'est pas encore implémentée.", parent=self.root)
+        top = tk.Toplevel(self.root)
+        top.title("Intersection d'automates")
+        top.geometry("400x200")  
+        ttk.Label(top, text="Automate 1:").grid(row=0, column=0, padx=5, pady=5)
+        combo1 = ttk.Combobox(top, values=noms, state="readonly")
+        combo1.current(0)
+        combo1.grid(row=0, column=1, padx=5, pady=5)     
+        ttk.Label(top, text="Automate 2:").grid(row=1, column=0, padx=5, pady=5)
+        combo2 = ttk.Combobox(top, values=noms, state="readonly")
+        combo2.current(1 if len(noms) > 1 else 0)
+        combo2.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(top, text="Longueur max:").grid(row=2, column=0, padx=5, pady=5)
+        spin_length = ttk.Spinbox(top, from_=1, to=10, width=5)
+        spin_length.set(5)
+        spin_length.grid(row=2, column=1, padx=5, pady=5, sticky='w')
+        def lancer_calcul():
+            try:
+                auto1 = Automate.charger(combo1.get())
+                auto2 = Automate.charger(combo2.get())
+                max_len = int(spin_length.get())
+                mots = auto1.intersection_mots(auto2, max_len)
+                
+                # Affichage du résultat
+                resultat = "\n".join(sorted(mots, key=lambda x: (len(x), x)))
+                messagebox.showinfo("Résultat",f"{len(mots)} mots communs trouvés (longueur ≤ {max_len}):\n{resultat}", parent=top)
+                
+            except Exception as e:
+                messagebox.showerror("Erreur", str(e), parent=top)
+        
+        ttk.Button(top, text="Calculer l'intersection", command=lancer_calcul).grid(row=3, columnspan=2, pady=10)
 
     def calculer_complement(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "Le calcul du complément n'est pas encore implémenté.", parent=self.root)
 
     def afficher_mots_rejetes(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)
+
+        if self.automate_courant:
+            nnb = simpledialog.askinteger(
+            "Longueur maximale",
+            "Entrez la longueur (1-10):",
+            parent=self.root,
+            minvalue=1,
+            maxvalue=10
+            )
+            if nnb is None:  
+              return
+            mots = self.automate_courant.generer_mots_rejetes(max_length=nnb)
+            messagebox.showinfo("Résultat", f"Les mots generer '{mots}' ", parent=self.root)
             return
-        messagebox.showinfo("Fonctionnalité non implémentée", "L'affichage des mots rejetés n'est pas encore implémentée.", parent=self.root)
 
 
 if __name__ == "__main__":

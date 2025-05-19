@@ -1,7 +1,7 @@
 import json
 import os
 from collections import deque, defaultdict
-from typing import List, Dict
+from typing import List, Dict,Set
 from classes.Alphabet import Alphabet
 from classes.Etat import Etat
 from classes.Transition import Transition
@@ -445,6 +445,121 @@ class Automate:
                 "etats": [e.to_dict() for e in self.etats],
                 "transitions": [t.to_dict() for t in self.transitions]
             }, f, indent=4)
+
+    def generer_mots_acceptes(self, max_length) -> Set[str]:
+        
+        etat_initial = next((etat for etat in self.etats if etat.type == "initial"), None)
+        if not etat_initial:
+            return set()
+        etats_finaux = {etat for etat in self.etats if etat.type == "final"}
+        mots_acceptes = set()
+        file = deque([(etat_initial, "")]) 
+
+        while file:
+            etat_actuel, mot_actuel = file.popleft()
+            if len(mot_actuel) > max_length:
+                continue
+            if etat_actuel in etats_finaux:
+                mots_acceptes.add(mot_actuel)
+            for trans in self.transitions:
+                if trans.source == etat_actuel:
+                    nouveau_mot = mot_actuel + trans.alphabet.valeur
+                    file.append((trans.destination, nouveau_mot))
+        return mots_acceptes  
+
+    def generer_mots_rejetes(self, max_length) -> set:
+        etat_initial = next((e for e in self.etats if e.type == "initial"), None)
+        etats_finaux = {e for e in self.etats if e.type == "final"}
+        if not etat_initial:
+            return set()
+        mots_rejetes = set()
+        file = deque([(etat_initial, "", False)])  
+        while file:
+            etat, mot, est_rejete = file.popleft()
+            if len(mot) > max_length:
+                continue
+            if len(mot) == max_length and etat not in etats_finaux:
+                mots_rejetes.add(mot)
+                continue
+            nouveau_rejete = est_rejete or (etat not in etats_finaux and len(mot) > 0)
+            for trans in self.transitions:
+                nouveau_mot = mot + trans.alphabet.valeur
+                if nouveau_rejete and len(nouveau_mot) <= max_length:
+                    mots_rejetes.add(nouveau_mot)        
+                file.append((trans.destination, nouveau_mot, nouveau_rejete))
+
+        return mots_rejetes
+
+
+    def sont_equivalents(afd1, afd2, max_length) -> tuple[bool, str]:
+        alpha1 = {a.valeur for a in afd1.alphabets}
+        alpha2 = {a.valeur for a in afd2.alphabets}
+        if alpha1 != alpha2:
+            return False, "Les alphabets des automates sont différents"
+        
+        etat_initial1 = next((e for e in afd1.etats if "initial" in e.type), None)
+        etat_initial2 = next((e for e in afd2.etats if "initial" in e.type), None)
+        if not etat_initial1:
+            return False, "Premier automate sans état initial"
+        if not etat_initial2:
+            return False, "Second automate sans état initial"
+        
+        file = deque()
+        file.append((etat_initial1, etat_initial2, ""))
+        visited = set()
+        while file:
+            e1, e2, mot = file.popleft()
+            e1_final = "final" in e1.type
+            e2_final = "final" in e2.type
+            if e1_final != e2_final:
+                return False, f"Différence d'acceptation après le mot '{mot}' (état {e1.id} vs {e2.id})"
+
+            if (e1.id, e2.id) in visited:
+                continue
+            visited.add((e1.id, e2.id))
+
+            if len(mot) >= max_length:
+                continue
+
+            for symbole in alpha1:
+                dest1 = next(
+                    (t.destination for t in afd1.transitions 
+                    if t.source.id == e1.id and t.alphabet.valeur == symbole),
+                    None
+                )
+                dest2 = next(
+                    (t.destination for t in afd2.transitions 
+                    if t.source.id == e2.id and t.alphabet.valeur == symbole),
+                    None
+                )            
+                if (dest1 is None) != (dest2 is None):
+                    return False, (
+                        f"Transition manquante pour le symbole '{symbole}' "
+                        f"après le mot '{mot}'\n"
+                        f"- Automate 1: {'présente' if dest1 else 'absente'}\n"
+                        f"- Automate 2: {'présente' if dest2 else 'absente'}"
+                    )
+
+                if dest1 and dest2:
+                    file.append((dest1, dest2, mot + symbole))
+        return True, f"Les automates sont équivalents pour tous les mots de longueur ≤ {max_length}"  
+
+    def union_mots(self, autre_automate: 'Automate', max_length: int = 5) -> set:
+        if {a.valeur for a in self.alphabets} != {a.valeur for a in autre_automate.alphabets}:
+            raise ValueError("Les alphabets doivent être identiques")
+        mots_self = self.generer_mots_acceptes(max_length)
+        mots_autre = autre_automate.generer_mots_acceptes(max_length)      
+        return mots_self.union(mots_autre)
+
+
+    
+    def intersection_mots(self, autre_automate: 'Automate', max_length: int = 5) -> set:
+        if {a.valeur for a in self.alphabets} != {a.valeur for a in autre_automate.alphabets}:
+            raise ValueError("Les alphabets doivent être identiques")
+        return (
+            self.generer_mots_acceptes(max_length) & 
+            autre_automate.generer_mots_acceptes(max_length)
+        )
     
     @classmethod
     def charger(cls, nom: str):
@@ -468,6 +583,8 @@ class Automate:
             automate.ajouter_transition(Transition.from_dict(t, etats, alphabets))
         
         return automate
+    
+    
 
     
     def __str__(self):
