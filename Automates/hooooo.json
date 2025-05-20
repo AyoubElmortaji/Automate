@@ -1,0 +1,102 @@
+{
+    "nom": "hooooo",
+    "alphabets": [
+        {
+            "idAlphabet": 1,
+            "valAlphabet": "a"
+        },
+        {
+            "idAlphabet": 2,
+            "valAlphabet": "b"
+        }
+    ],
+    "etats": [
+        {
+            "idEtat": 1,
+            "labelEtat": "0",
+            "typeEtat": "initial"
+        },
+        {
+            "idEtat": 2,
+            "labelEtat": "1",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 3,
+            "labelEtat": "2",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 4,
+            "labelEtat": "3",
+            "typeEtat": "normal"
+        },
+        {
+            "idEtat": 5,
+            "labelEtat": "4",
+            "typeEtat": "final"
+        }
+    ],
+    "transitions": [
+        {
+            "idTransition": 1,
+            "etatSource": 1,
+            "etatDestination": 1,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 2,
+            "etatSource": 1,
+            "etatDestination": 2,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 3,
+            "etatSource": 2,
+            "etatDestination": 3,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 4,
+            "etatSource": 3,
+            "etatDestination": 4,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 5,
+            "etatSource": 4,
+            "etatDestination": 5,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 6,
+            "etatSource": 5,
+            "etatDestination": 5,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 7,
+            "etatSource": 5,
+            "etatDestination": 5,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 8,
+            "etatSource": 3,
+            "etatDestination": 3,
+            "alphabet": 1
+        },
+        {
+            "idTransition": 9,
+            "etatSource": 2,
+            "etatDestination": 1,
+            "alphabet": 2
+        },
+        {
+            "idTransition": 10,
+            "etatSource": 4,
+            "etatDestination": 1,
+            "alphabet": 2
+        }
+    ]
+}
