@@ -1,5 +1,5 @@
 {
-    "nom": "minimalisation",
+    "nom": "testminim2",
     "alphabets": [
         {
             "idAlphabet": 1,
@@ -65,14 +65,14 @@
         {
             "idTransition": 5,
             "etatSource": 3,
-            "etatDestination": 3,
-            "alphabet": 2
+            "etatDestination": 2,
+            "alphabet": 1
         },
         {
             "idTransition": 6,
             "etatSource": 3,
-            "etatDestination": 2,
-            "alphabet": 1
+            "etatDestination": 3,
+            "alphabet": 2
         },
         {
             "idTransition": 7,
@@ -89,14 +89,14 @@
         {
             "idTransition": 9,
             "etatSource": 5,
-            "etatDestination": 3,
-            "alphabet": 2
+            "etatDestination": 2,
+            "alphabet": 1
         },
         {
             "idTransition": 10,
             "etatSource": 5,
-            "etatDestination": 2,
-            "alphabet": 1
+            "etatDestination": 3,
+            "alphabet": 2
         }
     ]
 }

@@ -438,8 +438,119 @@ class Automate:
         
         return automate
     
-    
 
+
+    def minimiser_auto(self):
+        
+        from collections import defaultdict
+
+        # Suprimer etat n acessibles
+        def accessibles(etat_init, transitions):
+            vus = set()
+            pile = [etat_init]
+            while pile:
+                e = pile.pop()
+                if e not in vus:
+                    vus.add(e)
+                    for t in transitions:
+                        if t.source.id == e:
+                            pile.append(t.destination.id)
+            return vus
+
+        etats_init = [e.id for e in self.etats if "initial" in e.type]
+        if not etats_init:
+            raise ValueError("Aucun état initial trouvé.")
+        accessibles_ids = accessibles(etats_init[0], self.transitions)
+        self.etats = [e for e in self.etats if e.id in accessibles_ids]
+        self.transitions = [t for t in self.transitions if t.source.id in accessibles_ids and t.destination.id in accessibles_ids]
+
+        # 2. Supprime le etat stériles (qui n'ateignent jamai un f)
+        finals = {e.id for e in self.etats if "final" in e.type}
+        def atteint_final(eid, visited=None):
+            if visited is None:
+                visited = set()
+            if eid in visited:
+                return False
+            visited.add(eid)
+            if eid in finals:
+                return True
+            for t in self.transitions:
+                if t.source.id == eid:
+                    if atteint_final(t.destination.id, visited):
+                        return True
+            return False
+        utiles = {e.id for e in self.etats if atteint_final(e.id)}
+        self.etats = [e for e in self.etats if e.id in utiles]
+        self.transitions = [t for t in self.transitions if t.source.id in utiles and t.destination.id in utiles]
+
+        # Partition initial  finaux / aures
+        finaux = {e.id for e in self.etats if "final" in e.type}
+        autres = {e.id for e in self.etats if e.id not in finaux}
+        partitions = [finaux, autres] if autres else [finaux]
+
+        alphabet = [a.valeur for a in self.alphabets]
+        transitions_map = {(t.source.id, t.alphabet.valeur): t.destination.id for t in self.transitions}
+
+        # 4. Raffinement des partitions
+        changed = True
+        while changed:
+            changed = False
+            nouvelles_partitions = []
+            for groupe in partitions:
+                sous_groupes = defaultdict(set)
+                for etat in groupe:
+                    signature = []
+                    for symbole in alphabet:
+                        dest = transitions_map.get((etat, symbole))
+                        for i, p in enumerate(partitions):
+                            if dest in p:
+                                signature.append(i)
+                                break
+                        else:
+                            signature.append(-1)
+                    sous_groupes[tuple(signature)].add(etat)
+                if len(sous_groupes) > 1:
+                    changed = True
+                nouvelles_partitions.extend(sous_groupes.values())
+            partitions = nouvelles_partitions
+
+        # 5. Construction du nouvel automate minimal
+        afd_min = Automate(nom=f"{self.nom}_minimal")
+        etat_map = {}
+        for i, groupe in enumerate(partitions):
+            label = next(e.label for e in self.etats if e.id in groupe)
+            type_etat = []
+            if any("initial" in e.type for e in self.etats if e.id in groupe):
+                type_etat.append("initial")
+            if any("final" in e.type for e in self.etats if e.id in groupe):
+                type_etat.append("final")
+            if not type_etat:
+                type_etat.append("normal")
+            nouvel_etat = Etat(id_etat=i + 1, label_etat=label, type_etat="_".join(type_etat))
+            afd_min.ajouter_etat(nouvel_etat)
+            etat_map[frozenset(groupe)] = nouvel_etat
+
+        # Ajouter les transitions
+        for groupe, nouvel_etat in etat_map.items():
+            representant = next(iter(groupe))
+            for sym in alphabet:
+                dest = transitions_map.get((representant, sym))
+                if dest is None:
+                    continue
+                for g, e in etat_map.items():
+                    if dest in g:
+                        alphabet_obj = next(a for a in self.alphabets if a.valeur == sym)
+                        afd_min.ajouter_transition(
+                            Transition(
+                                id_transition=len(afd_min.transitions) + 1,
+                                etat_source=nouvel_etat,
+                                etat_destination=e,
+                                alphabet=alphabet_obj
+                            )
+                        )
+                        break
+
+        return afd_min
     
     def __str__(self):
         return (
