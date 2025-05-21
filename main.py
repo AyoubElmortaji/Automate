@@ -679,18 +679,8 @@ class ModernAutomateApp:
             messagebox.showinfo("resultat", "automat est dejat minimal", parent=self.root)
             return
         
-        messagebox.showinfo("resultat", "fonctionalite pas encore appliquer", parent=self.root)
-        return
-        """
-        try:
-            automate_min = self.automate_courant.minimiser_auto()
-            self.automate_courant = automate_min
-            messagebox.showinfo("Succès", "L'automate a été minimisé avec succès.", parent=self.root)
-            self.afficher_details()
-            self.dessiner_automate()
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de la minimisation : {str(e)}", parent=self.root)
-        """
+        
+       
     def generer_mots_acceptes(self):
         if not self.automate_courant:
             messagebox.showerror("Erreur", "Aucun automate sélectionné.", parent=self.root)

@@ -5,6 +5,7 @@ from typing import List, Dict,Set
 from classes.Alphabet import Alphabet
 from classes.Etat import Etat
 from classes.Transition import Transition
+from typing import Set, Dict, Tuple, List
 
 class Automate:
     def __init__(self, nom: str):
@@ -186,22 +187,17 @@ class Automate:
 
 
     def est_minimal(self) -> bool:
-        """
-        Vérifie si l'automate est minimal (DFA minimal).
-        Retourne True si l'automate est minimal, False sinon.
-        """
-        # 1. Vérifier que l'automate est déterministe
+        print("→ Vérification de minimalité...")
         if not self.est_deterministe():
+            print("Non déterministe.")
             return False
-        
-        # 2. Vérifier que tous les états sont accessibles
         if not self.tous_etats_accessibles():
+            print("Contient des états inaccessibles.")
             return False
-        
-        # 3. Vérifier que tous les états sont distinguables
         if not self.tous_etats_distinguables():
+            print("Contient des états équivalents.")
             return False
-        
+        print("L'automate est minimal.")
         return True
 
     def tous_etats_accessibles(self) -> bool:
@@ -277,149 +273,7 @@ class Automate:
         return all(len(p) == 1 for p in partitions)
     
 
-
-    def minimiser_auto(self):
-        from collections import defaultdict
-
-        if not self.est_deterministe():
-            raise ValueError("L'automate doit être déterministe pour être minimisé")
-
-        if not self.est_complet():
-            self.completer_automate()
-
-        automate_accessible = self.supprimer_etats_inaccessibles()
-
-        F = {e.id for e in automate_accessible.etats if "final" in e.type}
-        non_F = {e.id for e in automate_accessible.etats} - F
-        partitions = []
-        if F:
-            partitions.append(F)
-        if non_F:
-            partitions.append(non_F)
-
-        transitions = defaultdict(dict)
-        for t in automate_accessible.transitions:
-            transitions[t.source.id][t.alphabet.valeur] = t.destination.id
-
-        alphabet_symbols = sorted({a.valeur for a in automate_accessible.alphabets})
-
-        changed = True
-        while changed:
-            changed = False
-            nouvelles_partitions = []
-
-            for groupe in partitions:
-                sous_groupes = defaultdict(list)
-                for etat_id in groupe:
-                    # Signature: partition index for each symbol
-                    signature = tuple(
-                        next(
-                            (i for i, p in enumerate(partitions)
-                             if transitions.get(etat_id, {}).get(sym, None) in p),
-                            -1
-                        )
-                        for sym in alphabet_symbols
-                    )
-                    sous_groupes[signature].append(etat_id)
-                nouvelles_partitions.extend(sous_groupes.values())
-                if len(sous_groupes) > 1:
-                    changed = True
-            partitions = nouvelles_partitions
-
-        # Construction du nouvel automate minimal
-        afd_minimal = Automate(nom=f"{self.nom}_minimal")
-        etats_minimaux = {}
-        for i, groupe in enumerate(partitions):
-            est_final = any(e_id in F for e_id in groupe)
-            est_initial = any(
-                e_id in {e.id for e in automate_accessible.etats if "initial" in e.type}
-                for e_id in groupe
-            )
-            type_etat = []
-            if est_initial:
-                type_etat.append("initial")
-            if est_final:
-                type_etat.append("final")
-            if not type_etat:
-                type_etat.append("normal")
-            nouvel_etat = Etat(
-                id_etat=i + 1,
-                label_etat=f"q{i}",
-                type_etat="_".join(type_etat)
-            )
-            afd_minimal.ajouter_etat(nouvel_etat)
-            etats_minimaux[frozenset(groupe)] = nouvel_etat
-
-        for i, groupe in enumerate(partitions):
-            etat_source = etats_minimaux[frozenset(groupe)]
-            etat_id_representant = next(iter(groupe))
-            for symbole in alphabet_symbols:
-                etat_dest_id = transitions.get(etat_id_representant, {}).get(symbole, None)
-                if etat_dest_id is None:
-                    continue
-                for dest_groupe in partitions:
-                    if etat_dest_id in dest_groupe:
-                        etat_dest = etats_minimaux[frozenset(dest_groupe)]
-                        break
-                else:
-                    continue
-                alphabet = next(a for a in automate_accessible.alphabets if a.valeur == symbole)
-                transition = Transition(
-                    id_transition=len(afd_minimal.transitions) + 1,
-                    etat_source=etat_source,
-                    etat_destination=etat_dest,
-                    alphabet=alphabet
-                )
-                afd_minimal.ajouter_transition(transition)
-
-        return afd_minimal
-
-    def supprimer_etats_inaccessibles(self):
-       
-        if not self.etats:
-            return self
-        
-        # Trouver les états accessibles
-        etats_accessibles = set()
-        etat_initial = next(e for e in self.etats if "initial" in e.type)
-        file = deque([etat_initial.id])
-        etats_accessibles.add(etat_initial.id)
-        
-        while file:
-            etat_id = file.popleft()
-            for t in self.transitions:
-                if t.source.id == etat_id and t.destination.id not in etats_accessibles:
-                    etats_accessibles.add(t.destination.id)
-                    file.append(t.destination.id)
-        
-        # Créer un nouvel automate avec seulement les états accessibles
-        automate_accessible = Automate(nom=f"{self.nom}_accessible")
-        
-        # Copier les états accessibles
-        for etat in self.etats:
-            if etat.id in etats_accessibles:
-                nouvel_etat = Etat(
-                    id_etat=etat.id,
-                    label_etat=etat.label,
-                    type_etat=etat.type
-                )
-                automate_accessible.ajouter_etat(nouvel_etat)
-        
-        # Copier les transitions entre états accessibles
-        for t in self.transitions:
-            if t.source.id in etats_accessibles and t.destination.id in etats_accessibles:
-                transition = Transition(
-                    id_transition=t.id,
-                    etat_source=next(e for e in automate_accessible.etats 
-                                if e.id == t.source.id),
-                    etat_destination=next(e for e in automate_accessible.etats 
-                                    if e.id == t.destination.id),
-                    alphabet=t.alphabet
-                )
-                automate_accessible.ajouter_transition(transition)
-        
-        return automate_accessible
-
+    
     
     def reconnait_mot(self, mot: str) -> bool:
         etats_actuels = {e.id for e in self.etats if "initial" in e.type}
